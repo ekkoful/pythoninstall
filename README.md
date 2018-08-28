@@ -1,88 +1,33 @@
-#! /bin/bash
-#
-# This is a script for auto install python2.7+
-#
-# CentOS 6 + Python2.7+ or Python3+
-#
-# SystemVersion: CentOS 6.5
-#
-# Author : beechoing@126.com
-#
-# GitHub : https://github.com/Beechoing/pythoninstall.git
-#
+### pythoninstall
+#### 自动安装python并配置相关环境
+1. 自动安装python2.7或者python3.6
+2. 完成时间:2017-12-12
+3. 此文档编辑时间:2017-12-12
 
-read -p  "请输入你想要安装的python2.7或者3.6(输入2或者3即可): " m
-until [ $m -eq 2 -o $m -eq 3 ];do 
-	read -p  "请输入你想要安装的python2.7或者3.6(输入2或者3即可): " m
-done 
+#### 测试环境
+1. CentOS6.5 64Bit
+2. Python2.7.14
+3. pip9.0.1
+4. 测试机器配置2H1G
 
-echo "日志文件为~/.pyinstall.log" 
-touch ~/.pyinstall.log
-log=~/.pyinstall.log
+#### 相关文件路径
+1. python2.7 安装路径：/usr/local/python27/
+2. python3.6 安装路径：/usr/local/python3/
+3. pip安装路径：/usr/local/$python/bin
 
-echo "创建目录/pythontar存放安装包..."
-mkdir /pythontar 
+#### 文件相关
+1. /pythontar：下载的源码文件(可以删除)
+2. /usr/src：解压后的源码文件配置
 
-echo "安装开发环境" | tee -a $log
-yum groupinstall "Development tools" -y &>> $log
-yum groupinstall "Server Platform Development" -y &>> $log
-yum install openssl-devel -y &>> $log
+#### 注意事项
+1. 保持网络畅通
+2. 保持yum源可以使用
 
-
-if [ $m -eq 2 ];then 
-	echo "正在下载python2.7.14..."
-	wget -q https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tgz -P /pythontar/
-	tar xf /pythontar/Python-2.7.14.tgz -C /usr/src/ 
-	cd /usr/src/Python-2.7.14
-	./configure --prefix=/usr/local/python27/ --enable-shared
-	make && make install
-	cd 
-	mv /usr/bin/python{,2.6.6}
-	ln -s /usr/local/python27/bin/python2.7 /usr/bin/python 
-	sed -i '1 s/python/python2.6/g' /usr/bin/yum 
-	echo "export PATH=$PATH:/usr/local/python27/bin" > /etc/profile.d/py.sh
-	source /etc/profile.d/py.sh
-	echo '/usr/local/python27/lib' > /etc/ld.so.conf.d/libpython2.3.conf
-	ldconfig
-else
-	echo "正在下载python3.6.3..."
-	wget -q https://www.python.org/ftp/python/3.6.3/Python-3.6.3.tgz -P /pythontar/
-	tar xf /pythontar/Python-3.6.3.taz -C /usr/src/
-	cd /usr/src/Python-3.6.3
-	./configure --prefix=/usr/local/python3/ --enable-shared 
-	make && make install
-	cd 
-	mv /usr/bin/python{,2.6.6}
-	ln -s /usr/local/python3/bin/python /usr/bin/python 
-	sed -i '1 s/python/python2.6/g' /usr/bin/yum 
-	echo "export PATH=$PATH:/usr/local/python3/bin" > /etc/profile.d/py.sh
-	source /etc/profile.d/py.sh
-	echo '/usr/local/python3/lib' > /etc/ld.so.conf.d/libpython3.conf
-	ldconfig
-fi 
-
-if `python --version`;then 
-	echo "新版本python已经安装完成"
-	read -p "请问是否安装pip...(y|n): " s 
-	until [ $s == 'y' -o $s == 'n' ];do 
-		read -p "请问是否安装pip...(y|n): " s 
-	done
-
-	if [ $s == 'y' ];then
-		echo "正在下载pip..."
-		wget -q https://bootstrap.pypa.io/get-pip.py -P /pythontar/
-		cd /pythontar/
-		python get-pip.py
-		source /etc/profile.d/py.sh
-		echo "脚本执行结束^-^"
-	else 
-		echo "脚本执行结束^-^"
-	fi
-else 
-	echo "新版本python安装失败,请查找错误原因" 
-	echo "脚本执行结束^-^"
-fi
-
-
-
-
+#### 使用方法
+```bash
+   cd
+   git clone https://github.com/Beechoing/pythoninstall.git
+   cd pythoninstall
+   chmod +x pyinstall.sh
+   ./pyinstall.sh
+```
